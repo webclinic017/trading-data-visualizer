@@ -7,16 +7,16 @@ sys.path.append(f"{str(working_dir)}/config")
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
-from pandas import Timestamp # Don't remove
+from pandas import time_datastamp # Don't remove
 import numpy as np
-import datetime, logging
+import time, logging
 from strategy import DeviL
 
-logging.basicConfig(level=logging.INFO,format="%(asctime)s : %(message)s")
+logging.basicConfig(level=logging.INFO,format="%(asctime_data)s : %(message)s")
 
-# TODO: This system going to be ploted by Chart.js (bankof3v.com)
+# TODO: This system going to be ploted by Chart.js (project.com)
 
-def plot_indicator(Strategy):
+def plot_indicator(strategy):
 
     os.makedirs(f"{working_dir}/static/indicator/", exist_ok=True)
 
@@ -36,35 +36,35 @@ def plot_indicator(Strategy):
             print(f"{i} / {row_count}")
             print("into the loop")
 
-            symbol  = df_useme["Ticker"][i] 
-            atr     = df_useme["ATR"][i] 
-            tr      = df_useme["TR"][i] 
-            core    = df_useme["Core"][i] 
-            trend   = df_useme["Trend"][i] 
+            symbol  = df_useme["tickerSymbol"][i] 
+            atr     = df_useme["atr"][i] 
+            tr      = df_useme["trueRange"][i] 
+            coreLine    = df_useme["coreLine"][i] 
+            trendLine   = df_useme["trendLine"][i] 
 
             print(f"target -> {symbol}")
 
             df = pd.read_csv(f"remorder/stream_db/{symbol}.csv")
 
-            df = DeviL.create_df(df, tr, atr, trend, core)
+            df = DeviL.create_df(df, tr, atr, trendLine, coreLine)
             
             show_range = int(1440*3)
 
-            df['OpenTime'] = df['OpenTime']/1000
-            df['OpenTime'] = pd.to_datetime(df['OpenTime'].astype(int), unit='s')
+            df['opentime_data'] = df['opentime_data']/1000
+            df['opentime_data'] = pd.to_time(df['opentime_data'].astype(int), unit='s')
 
-            x_opentime = df['OpenTime'].tail(show_range)
-            y_close = df['Close'].tail(show_range)
-            y_trend = df['Trend'].tail(show_range)
+            x_opentime_data = df['opentime_data'].tail(show_range)
+            y_close = df['close'].tail(show_range)
+            y_trendLine = df['trendLine'].tail(show_range)
             y_upper = df['Upper'].tail(show_range)
-            y_lower = df['Lower'].tail(show_range)
-            y_core  = df['Core'].tail(show_range)
+            y_lower = df['lower'].tail(show_range)
+            y_coreLine  = df['coreLine'].tail(show_range)
 
-            plt.plot(x_opentime,y_close)
-            plt.plot(x_opentime,y_trend)
-            plt.plot(x_opentime,y_upper)
-            plt.plot(x_opentime,y_lower)
-            plt.plot(x_opentime,y_core)
+            plt.plot(x_opentime_data,y_close)
+            plt.plot(x_opentime_data,y_trendLine)
+            plt.plot(x_opentime_data,y_upper)
+            plt.plot(x_opentime_data,y_lower)
+            plt.plot(x_opentime_data,y_coreLine)
 
             #plt.legend(loc = 'lower right') 
 
@@ -83,5 +83,5 @@ def plot_indicator(Strategy):
         pass
 
 if __name__ =="__main__":
-    Strategy = "Diviation_Long"
-    plot_indicator(Strategy)
+    strategy = "Diviation_Long"
+    plot_indicator(strategy)

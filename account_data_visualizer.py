@@ -16,14 +16,14 @@ log = logging.getLogger("rich")
 
 def run(exchangeName, debug = False):
     try:
-        connection = sqlite3.connect(f"{outside_dir}/bankof3v.db")
+        connection = sqlite3.connect(f"{outside_dir}/project.db")
         c = connection.cursor()
 
         c.execute(f'SELECT * FROM account_{exchangeName}') 
 
         account_data = c.fetchone()
 
-        data_time = analyze.func_datatime_data(account_data)
+        data_time_data = analyze.func_datatime_data_data(account_data)
 
         position_data = analyze.func_position_data(account_data)
 
@@ -39,16 +39,16 @@ def run(exchangeName, debug = False):
         list_notional = position_data[9]
         list_positionAmt = position_data[10]
         list_positionSide = position_data[11]
-        list_positionSymbol = position_data[12]
-        list_unRealizedProfit = position_data[13]
-        list_updateTime = position_data[14]
+        list_positionsymbol = position_data[12]
+        list_unRealizedprofit = position_data[13]
+        list_uptime = position_data[14]
         total_notional = position_data[15]
         list_all_positive_notional = position_data[16]
-        list_positionSymbolAndSide = position_data[17]
+        list_positionsymbolAndSide = position_data[17]
         total_LONG_notional = position_data[18]
         total_Short_notional = position_data[19]
-        total_unRealizedProfitLoss = position_data[20]
-        total_unRealized_ProfitONLY = position_data[21]
+        total_unRealizedprofitLoss = position_data[20]
+        total_unRealized_profitONLY = position_data[21]
         total_unRealized_LossONLY = position_data[21]
 
         balance_data = analyze.func_balance_data(account_data)
@@ -63,19 +63,19 @@ def run(exchangeName, debug = False):
 
         line = analyze.create_list(exchangeName, debug)
 
-        list_data_time = line[0]
+        list_data_time_data = line[0]
         list_total_balance = line[1]
         list_total_withdrawAvailable = line[2]
         list_total_notional = line[3]
         list_total_LONG_notional = line[4]
         list_total_SHORT_notional = line[5]
-        list_total_unRealizedProfitLoss = line[6]
-        list_total_unRealized_ProfitONLY = line[7]
+        list_total_unRealizedprofitLoss = line[6]
+        list_total_unRealized_profitONLY = line[7]
         list_total_unRealized_LossONLY_Negative = line[8]
         #________________________________________________________________________________________________
         
         fig = plt.figure(figsize=(10, 15), dpi=72)
-        fig.suptitle(f'{exchangeName} {data_time} UTC', fontsize=13)
+        fig.suptitle(f'{exchangeName} {data_time_data} UTC', fontsize=13)
 
         gs = GridSpec(5, 5)
 
@@ -101,40 +101,40 @@ def run(exchangeName, debug = False):
 
         ax10_1.yaxis.set_label_position("right")
         ax10_1.yaxis.tick_right()
-        ax10_1.plot(list_data_time, list_total_balance, marker="o", label="balance")
+        ax10_1.plot(list_data_time_data, list_total_balance, marker="o", label="balance")
         ax10_1.legend(loc='upper left')
 
         ax10_2.pie(list_balance, labels=list_asset, autopct='%1.1f%%', shadow=True, startangle=90)
         ax10_2.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 
-        #unRealizedProfitLoss
+        #unRealizedprofitLoss
 
-        ax15_1.set_title(f'unRealizedProfitLoss ${round(total_unRealizedProfitLoss,1)}')
+        ax15_1.set_title(f'unRealizedprofitLoss ${round(total_unRealizedprofitLoss,1)}')
 
         ax15_1.yaxis.set_label_position("right")
         ax15_1.yaxis.tick_right()
-        ax15_1.plot(list_data_time, list_total_unRealizedProfitLoss, marker="o", label="unRealizedProfitLoss")
+        ax15_1.plot(list_data_time_data, list_total_unRealizedprofitLoss, marker="o", label="unRealizedprofitLoss")
 
-        ax15_2.set_title(f'unRealized Profit  ${round(total_unRealized_ProfitONLY,1)}')
+        ax15_2.set_title(f'unRealized profit  ${round(total_unRealized_profitONLY,1)}')
         ax15_2.yaxis.set_label_position("right")
         ax15_2.yaxis.tick_right()
-        ax15_2.plot(list_data_time, list_total_unRealized_ProfitONLY, marker="o", label="unRealized Profit")
+        ax15_2.plot(list_data_time_data, list_total_unRealized_profitONLY, marker="o", label="unRealized profit")
 
         ax15_2.set_title(f'unRealized Loss  ${round(total_unRealized_LossONLY*-1,1)}')
         ax15_3.yaxis.set_label_position("right")
         ax15_3.yaxis.tick_right()
-        ax15_3.plot(list_data_time, list_total_unRealized_LossONLY_Negative, marker="o", label="unRealized Loss")
+        ax15_3.plot(list_data_time_data, list_total_unRealized_LossONLY_Negative, marker="o", label="unRealized Loss")
 
-        if total_unRealized_ProfitONLY == 0:
-            total_unRealized_ProfitONLY = 0.001
-        ax15_4.pie([total_unRealized_ProfitONLY, total_unRealized_LossONLY], labels=["Profit","Loss"], autopct='%1.1f%%', shadow=True, startangle=90)
+        if total_unRealized_profitONLY == 0:
+            total_unRealized_profitONLY = 0.001
+        ax15_4.pie([total_unRealized_profitONLY, total_unRealized_LossONLY], labels=["profit","Loss"], autopct='%1.1f%%', shadow=True, startangle=90)
         ax15_4.axis('equal') 
 
         # # Withdraw
         ax20_1.set_title(f'Withdrawable ${round(total_withdrawAvailable,1)}')
         ax20_1.yaxis.set_label_position("right")
         ax20_1.yaxis.tick_right()
-        ax20_1.plot(list_data_time, list_total_withdrawAvailable, marker="o", label="withdrawAvailable")
+        ax20_1.plot(list_data_time_data, list_total_withdrawAvailable, marker="o", label="withdrawAvailable")
         ax20_1.legend(loc='upper left')
 
         ax20_2.pie(list_withdrawAvailable, labels=list_asset, autopct='%1.1f%%', shadow=True, startangle=90)
@@ -145,10 +145,10 @@ def run(exchangeName, debug = False):
 
         ax30_1.yaxis.set_label_position("right")
         ax30_1.yaxis.tick_right()
-        ax30_1.plot(list_data_time, list_total_notional, marker="o", label="notional")
+        ax30_1.plot(list_data_time_data, list_total_notional, marker="o", label="notional")
         ax30_1.legend(loc='upper left')
 
-        ax30_2.pie(list_all_positive_notional, labels=list_positionSymbolAndSide, autopct='%1.1f%%',shadow=True, startangle=90)
+        ax30_2.pie(list_all_positive_notional, labels=list_positionsymbolAndSide, autopct='%1.1f%%',shadow=True, startangle=90)
         ax30_2.axis('equal')  
 
         # Side
@@ -156,8 +156,8 @@ def run(exchangeName, debug = False):
 
         ax40_1.yaxis.set_label_position("right")
         ax40_1.yaxis.tick_right()
-        ax40_1.plot(list_data_time, list_total_LONG_notional, marker="o", label="LONG_notional")
-        ax40_1.plot(list_data_time, list_total_SHORT_notional, marker="o", label="SHORT_notional")
+        ax40_1.plot(list_data_time_data, list_total_LONG_notional, marker="o", label="LONG_notional")
+        ax40_1.plot(list_data_time_data, list_total_SHORT_notional, marker="o", label="SHORT_notional")
         ax40_1.legend(loc='upper left')
 
         if total_LONG_notional > 0 or total_Short_notional > 0:
@@ -169,10 +169,10 @@ def run(exchangeName, debug = False):
         #___________________________________________________________
         plt.gcf().autofmt_xdate()
 
-        LOCAL_path = f"{working_dir}/static/TEMP"
+        local_path = f"{working_dir}/static/TEMP"
 
-        os.makedirs(LOCAL_path, exist_ok=True)
-        file_path = f'{LOCAL_path}/report_{exchangeName}.png'
+        os.makedirs(local_path, exist_ok=True)
+        file_path = f'{local_path}/report_{exchangeName}.png'
 
         fig.savefig(file_path)
 

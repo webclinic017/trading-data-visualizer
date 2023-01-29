@@ -9,27 +9,27 @@ from batch import screener, kline
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
-def run(df, Ticker, ActivationTime, CandleTimeFrame, drop_VolUSD, drop_NATR):
+def run(df, tickerSymbol, activationTime, candleTimeFrame, drop_volumeInUSD, drop_normATR):
 
     fig = plt.figure(figsize = (20,12), facecolor='lightblue')
-    show_range   = int(7*1440 /CandleTimeFrame)
-    x = df['OpenTime'].tail(show_range)
+    show_range   = int(7*1440 /candleTimeFrame)
+    x = df['openTime'].tail(show_range)
 
     total_charts = 4
 
     ax1 = fig.add_subplot(total_charts, 1, 1)
-    ax1.set_title(f'{Ticker}: {ActivationTime}', fontsize=18)
-    y_NATR = df['Close'].tail(show_range)
-    ax1.plot(x, y_NATR, marker='', color= "green", label="Close")
+    ax1.set_title(f'{tickerSymbol}: {activationTime}', fontsize=18)
+    y_normATR = df['close'].tail(show_range)
+    ax1.plot(x, y_normATR, marker='', color= "green", label="close")
     ax1.grid(axis='both',linestyle='dotted', color='gray')
-    ax1.set_ylabel('Close')
+    ax1.set_ylabel('close')
     ax1.legend(loc='upper left')
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%D %H:%M'))
     ax1.xaxis.set_major_locator(mdates.HourLocator(interval=6))
 
     ax2 = fig.add_subplot(total_charts, 1, 2)
-    y_NATR = df['VolRatio'].tail(show_range)
-    ax2.plot(x, y_NATR, marker='', color= "red", label="VolRatio")
+    y_normATR = df['VolRatio'].tail(show_range)
+    ax2.plot(x, y_normATR, marker='', color= "red", label="VolRatio")
     ax2.axhline(y=0, xmin=0, xmax=1, linestyle="solid", color = "gray")
     ax2.axhline(y=100, xmin=0, xmax=1, linestyle="dashed", color = "gray")
     ax2.axhline(y=-100, xmin=0, xmax=1, linestyle="dashed", color = "gray")
@@ -43,7 +43,7 @@ def run(df, Ticker, ActivationTime, CandleTimeFrame, drop_VolUSD, drop_NATR):
     y_VolUSD_SMA = df['VolUSD_SMA'].tail(show_range)
     ax3.plot(x, y_VolUSD_SMA, marker='', color= "purple", label="VolUSD_SMA")
     ax3.axhline(y=0, xmin=0, xmax=1, linestyle="solid", color = "gray")
-    ax3.axhline(y=drop_VolUSD, xmin=0, xmax=1, linestyle="dashed", color = "gray")
+    ax3.axhline(y=drop_volumeInUSD, xmin=0, xmax=1, linestyle="dashed", color = "gray")
     ax3.axhline(y=10000000, xmin=0, xmax=1, linestyle="dashed", color = "gray")        
     ax3.grid(axis='both',linestyle='dotted', color='gray')
     ax3.set_ylabel('VolUSD_SMA')
@@ -52,22 +52,22 @@ def run(df, Ticker, ActivationTime, CandleTimeFrame, drop_VolUSD, drop_NATR):
     ax3.xaxis.set_major_locator(mdates.HourLocator(interval=6))
 
     ax4 = fig.add_subplot(total_charts, 1, 4)
-    y_NATR = df['NATR'].tail(show_range)
-    ax4.plot(x, y_NATR, marker='', color= "green", label="NATR")
+    y_normATR = df['normATR'].tail(show_range)
+    ax4.plot(x, y_normATR, marker='', color= "green", label="normATR")
     ax4.axhline(y=0,         xmin=0, xmax=1, linestyle="solid", color = "gray")
-    ax4.axhline(y=drop_NATR, xmin=0, xmax=1, linestyle="solid", color = "gray")
+    ax4.axhline(y=drop_normATR, xmin=0, xmax=1, linestyle="solid", color = "gray")
     ax4.axhline(y=10,        xmin=0, xmax=1, linestyle="dashed", color = "gray")
     ax4.grid(axis='both',linestyle='dotted', color='gray')
-    ax4.set_ylabel('NATR')
+    ax4.set_ylabel('normATR')
     ax4.legend(loc='upper left')
     ax4.xaxis.set_major_formatter(mdates.DateFormatter('%D %H:%M'))
     ax4.xaxis.set_major_locator(mdates.HourLocator(interval=6))
 
     plt.gcf().autofmt_xdate()
-    plt.savefig(f"./backtest/data/SCREEN/{ActivationTime}/{Ticker}", dpi=50)
+    plt.savefig(f"./backtest/data/SCREEN/{activationTime}/{tickerSymbol}", dpi=50)
     plt.close()
 
-    print(f"Ploted Screener Chart. {Ticker}")
+    print(f"Ploted Screener Chart. {tickerSymbol}")
 
 
 
@@ -75,28 +75,28 @@ def run(df, Ticker, ActivationTime, CandleTimeFrame, drop_VolUSD, drop_NATR):
 
 if __name__ == "__main__": 
 
-    Ticker = "BTCUSDT"
-    ActivationTime = "000000000000"
+    tickerSymbol = "BTCUSDT"
+    activationTime = "000000000000"
 
     fetch_days = 33
-    CandleTimeFrame = 60
+    candleTimeFrame = 60
 
-    drop_VolUSD = 0
-    drop_NATR = 0
+    drop_volumeInUSD = 0
+    drop_normATR = 0
     
-    run(df, Ticker, ActivationTime, CandleTimeFrame, drop_VolUSD, drop_NATR)
+    run(df, tickerSymbol, activationTime, candleTimeFrame, drop_volumeInUSD, drop_normATR)
 
 
     #---------------------------------------- PLOT --------------------------------------------------
     """
-    list_passed_Ticker = passed_df['Ticker'].tolist()
-    print(list_passed_Ticker)
+    list_passed_tickerSymbol = passed_df['tickerSymbol'].tolist()
+    print(list_passed_tickerSymbol)
 
-    for Ticker in list_passed_Ticker:
+    for tickerSymbol in list_passed_tickerSymbol:
 
-        df = kline.fetch(Ticker, fetch_days, CandleTimeFrame)
+        df = kline.fetch(tickerSymbol, fetch_days, candleTimeFrame)
         df = create_df(df)
 
-        plot_screen.run(df, Ticker, ActivationTime, CandleTimeFrame, drop_VolUSD, drop_NATR)
+        plot_screen.run(df, tickerSymbol, activationTime, candleTimeFrame, drop_volumeInUSD, drop_normATR)
     """
 
